@@ -1,50 +1,52 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Registro de asistencia</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Registro de Asistencia</title>
 </head>
 <body>
-  <h1>Registro de asistencia</h1>
-  <div id="reader" style="width: 500px;"></div>
+  <h1>Registro de Asistencia</h1>
+  <div id="reader" style="width: 300px;"></div>
   <div id="result"></div>
 
-  <!-- 👇 Aquí cargamos la librería antes de usarla -->
-  <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
+  <!-- ✅ Librería cargada desde un CDN confiable -->
+  <script src="https://cdn.jsdelivr.net/npm/html5-qrcode/minified/html5-qrcode.min.js"></script>
 
   <script>
-    // URL de tu Google Apps Script
-    const API_URL = "https://script.google.com/macros/s/AKfycbwE2e9ZOhOjjZQ6q2kqnr8VD3Zl-jVJtLRk1f2sm-JMDyrX2P4pkfyHaIVD79waVRNH1g/exec";
+    const scriptUrl = "https://script.google.com/macros/s/AKfycbwE2e9ZOhOjjZQ6q2kqnr8VD3Zl-jVJtLRk1f2sm-JMDyrX2P4pkfyHaIVD79waVRNH1g/exec";
 
     function onScanSuccess(decodedText, decodedResult) {
-      document.getElementById('result').innerText = `Código detectado: ${decodedText}`;
-      
+      document.getElementById("result").innerText = `Código detectado: ${decodedText}`;
+
       try {
-        const data = JSON.parse(decodedText); // QR con formato JSON
-        fetch(API_URL, {
+        const data = JSON.parse(decodedText);
+
+        fetch(scriptUrl, {
           method: "POST",
-          mode: "no-cors",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data)
-        }).then(() => {
-          alert("Asistencia registrada con éxito ✅");
-        }).catch(err => {
-          console.error("Error enviando datos:", err);
-          alert("Hubo un error al registrar la asistencia ❌");
+          body: JSON.stringify(data),
+          headers: { "Content-Type": "application/json" }
+        })
+        .then(res => res.text())
+        .then(txt => {
+          alert("Asistencia registrada con éxito: " + txt);
+        })
+        .catch(err => {
+          alert("Error al registrar: " + err);
         });
       } catch (e) {
-        alert("El QR no tiene el formato correcto ❌");
+        alert("El código escaneado no tiene el formato correcto.");
       }
     }
 
     function onScanError(errorMessage) {
-      console.warn(`Error en escaneo: ${errorMessage}`);
+      console.warn(errorMessage);
     }
 
-    // 👇 Ahora sí usamos la librería
+    // ✅ Inicializa el escáner
     const html5QrcodeScanner = new Html5QrcodeScanner(
-      "reader", { fps: 10, qrbox: 250 }
+      "reader",
+      { fps: 10, qrbox: 250 }
     );
     html5QrcodeScanner.render(onScanSuccess, onScanError);
   </script>
