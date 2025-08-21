@@ -15,12 +15,10 @@ body { font-family: Arial; text-align: center; padding: 20px; }
 <div id="reader"></div>
 <div id="result">Esperando escaneo...</div>
 
-<!-- Librería HTML5 QR Code -->
 <script src="https://cdn.jsdelivr.net/npm/html5-qrcode/minified/html5-qrcode.min.js"></script>
 
 <script>
-// URL del Web App con proxy CORS temporal
-const scriptUrl = "https://corsproxy.io/?https://script.google.com/macros/s/AKfycbz-YMBqJOkSzcYUopM1yy1LT6wKqD680lFKWHzcYdr3vcO5EDmwILsBLo_I_LYvSbG0ow/exec";
+const scriptUrl = "https://script.google.com/macros/s/AKfycbzu_TF2Ii5qjko0wz8MJGMq3eXbDnyo2sGIt-ZOvQsWfMt1F--9WdOjuf3NdpVbIQyN-w/exec"; // pega aquí la URL que copiaste
 
 function onScanSuccess(decodedText) {
   document.getElementById("result").innerText = "Código detectado: " + decodedText;
@@ -53,7 +51,6 @@ function onScanSuccess(decodedText) {
 
 function onScanError(err) { console.warn(err); }
 
-// Inicializar lector QR
 const html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
 html5QrcodeScanner.render(onScanSuccess, onScanError);
 </script>
