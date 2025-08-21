@@ -1,27 +1,33 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Registro de Asistencia</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+    #reader { width: 300px; margin: auto; }
+    #result { margin-top: 20px; font-size: 18px; font-weight: bold; color: #2F5AA2; }
+  </style>
 </head>
 <body>
-  <h1>Registro de Asistencia</h1>
-  <div id="reader" style="width: 300px;"></div>
-  <div id="result"></div>
+  <h1>📋 Registro de Asistencia</h1>
+  <div id="reader"></div>
+  <div id="result">Esperando escaneo...</div>
 
-  <!-- ✅ Librería cargada desde un CDN confiable -->
+  <!-- Librería HTML5 QR Code -->
   <script src="https://cdn.jsdelivr.net/npm/html5-qrcode/minified/html5-qrcode.min.js"></script>
 
   <script>
     const scriptUrl = "https://script.google.com/macros/s/AKfycbwE2e9ZOhOjjZQ6q2kqnr8VD3Zl-jVJtLRk1f2sm-JMDyrX2P4pkfyHaIVD79waVRNH1g/exec";
 
-    function onScanSuccess(decodedText, decodedResult) {
-      document.getElementById("result").innerText = `Código detectado: ${decodedText}`;
+    function onScanSuccess(decodedText) {
+      document.getElementById("result").innerText = "Código detectado: " + decodedText;
 
       try {
-        const data = JSON.parse(decodedText);
+        const data = JSON.parse(decodedText); // convierte QR a objeto
 
+        // Enviar al Apps Script
         fetch(scriptUrl, {
           method: "POST",
           body: JSON.stringify(data),
@@ -29,24 +35,25 @@
         })
         .then(res => res.text())
         .then(txt => {
-          alert("Asistencia registrada con éxito: " + txt);
+          document.getElementById("result").innerText = "✅ Registro enviado: " + txt;
         })
         .catch(err => {
-          alert("Error al registrar: " + err);
+          console.error("Error enviando datos:", err);
+          document.getElementById("result").innerText = "❌ Error al enviar";
         });
+
       } catch (e) {
-        alert("El código escaneado no tiene el formato correcto.");
+        document.getElementById("result").innerText = "❌ QR inválido";
       }
     }
 
     function onScanError(errorMessage) {
-      console.warn(errorMessage);
+      console.warn("Error de escaneo:", errorMessage);
     }
 
-    // ✅ Inicializa el escáner
+    // Inicializar el lector QR
     const html5QrcodeScanner = new Html5QrcodeScanner(
-      "reader",
-      { fps: 10, qrbox: 250 }
+      "reader", { fps: 10, qrbox: 250 }
     );
     html5QrcodeScanner.render(onScanSuccess, onScanError);
   </script>
