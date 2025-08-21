@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Registro de Asistencia</title>
+  <script src="https://unpkg.com/html5-qrcode@2.3.7/minified/html5-qrcode.min.js"></script>
+  <style>
+    body { font-family: Arial; text-align: center; margin: 50px; }
+    #qr-reader { width: 80%; max-width: 500px; margin: auto; }
+    h1 { color: #2F5AA2; }
+  </style>
+</head>
+<body>
+  <h1>Registro de Asistencia</h1>
+  <div id="qr-reader"></div>
+
+  <script>
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwE2e9ZOhOjjZQ6q2kqnr8VD3Zl-jVJtLRk1f2sm-JMDyrX2P4pkfyHaIVD79waVRNH1g/exec";
+
+    function onScanSuccess(decodedText, decodedResult) {
+      try {
+        const dataQR = JSON.parse(decodedText);
+
+        navigator.geolocation.getCurrentPosition(function(pos) {
+          fetch(APPS_SCRIPT_URL, {
+            method: "POST",
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({
+              usuario: dataQR.userId,
+              accion: dataQR.action,
+              nombre: dataQR.nombre || "",
+              latitud: pos.coords.latitude,
+              longitud: pos.coords.longitude
+            })
+          })
+          .then(res => res.json())
+          .then(data => alert(data.message))
+          .catch(err => console.error(err));
+        }, function(error) {
+          alert("No se pudo obtener la ubicación. Activa el GPS o permite el acceso.");
+        });
+
+      } catch(e) {
+        alert("QR inválido");
+      }
+    }
+
+    function onScanFailure(error) {
+      // Ignorar errores de escaneo intermedio
+    }
+
+    let html5QrcodeScanner = new Html5QrcodeScanner(
+      "qr-reader", { fps: 10, qrbox: 250 });
+    html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+  </script>
+</body>
+</html>
