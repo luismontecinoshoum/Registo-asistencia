@@ -3,15 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <title>Registro de Asistencia</title>
-  <script src="https://unpkg.com/html5-qrcode@2.3.7/minified/html5-qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.7/minified/html5-qrcode.min.js"></script>
   <style>
     body { font-family: Arial; text-align: center; margin: 50px; }
     #qr-reader { width: 80%; max-width: 500px; margin: auto; }
     h1 { color: #2F5AA2; }
+    p { color: #555; }
   </style>
 </head>
 <body>
   <h1>Registro de Asistencia</h1>
+  <p>Escanea tu QR y permite acceso a la ubicación.</p>
   <div id="qr-reader"></div>
 
   <script>
@@ -41,17 +43,20 @@
         });
 
       } catch(e) {
-        alert("QR inválido");
+        alert("QR inválido. Asegúrate de que sea un QR generado correctamente.");
       }
     }
 
     function onScanFailure(error) {
-      // Ignorar errores intermedios
+      // Puedes ignorar errores intermedios de escaneo
     }
 
-    let html5QrcodeScanner = new Html5QrcodeScanner(
-      "qr-reader", { fps: 10, qrbox: 250 });
-    html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+    // Espera a que la página cargue completamente
+    window.onload = function() {
+      let html5QrcodeScanner = new Html5QrcodeScanner(
+        "qr-reader", { fps: 10, qrbox: 250 });
+      html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+    };
   </script>
 </body>
 </html>
